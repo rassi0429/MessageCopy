@@ -40,7 +40,7 @@ namespace MessageCopy
                         string msg = text.Content;
                         text.Destroy();
                         var ui = new UIBuilder(c);
-                        ui.Button(msg, new color(1, 1, 1, 0.8f)).LocalPressed += (IButton btn, ButtonEventData _) => { btn.World.InputInterface.Clipboard.SetText(btn.LabelText); };
+                        ui.Button(msg, new color(1, 1, 1, 0)).LocalPressed += (IButton btn, ButtonEventData _) => { btn.World.InputInterface.Clipboard.SetText(btn.LabelText); };
                         var btnText = c.GetComponentInChildren<Text>();
                         btnText.Align = message.IsSent ? Alignment.MiddleRight : Alignment.MiddleLeft;
                     }
