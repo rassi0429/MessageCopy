@@ -16,7 +16,7 @@ namespace MessageCopy
     {
         public override string Name => "MessageCopy";
         public override string Author => "kka429";
-        public override string Version => "1.1.0";
+        public override string Version => "1.2.0";
         public override string Link => "https://github.com/rassi0429/MessageCopy"; // this line is optional and can be omitted
 
         public override void OnEngineInit()
