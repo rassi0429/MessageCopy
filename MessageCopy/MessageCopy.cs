@@ -60,17 +60,22 @@ namespace MessageCopy
                             var text = c.GetComponent<Text>().Content;
                             if (text == "Join")
                             {
-                                Slot d = c.Parent.Duplicate();
-                                var t = d.GetComponent<RectTransform>();
-                                t.AnchorMin.Value = new float2(0.4f, 0f);
-                                t.AnchorMax.Value = new float2(0.69f, 1f);
-                                var btn = d.GetComponent<Button>();
-                                var image = d.GetComponent<Image>();
-                                btn.Destroy();
-                                image.Destroy();
-                                var newImage = d.AttachComponent<Image>();
-                                var newBtn = d.AttachComponent<Button>();
-                                newBtn.LocalPressed += (IButton b, ButtonEventData _) =>
+                                //Source(Join) Button Resize
+                                Slot DuplicatedSlot_Src = c.Parent;
+                                DuplicatedSlot_Src.GetComponent<RectTransform>().AnchorMin.Value = new float2(0.8f, 0f);
+
+                                //Create Orb Button
+                                Slot DuplicatedSlot_Orb = c.Parent.Duplicate();
+                                DuplicatedSlot_Orb.GetComponent<RectTransform>().AnchorMin.Value = new float2(0.6f, 0f);
+                                DuplicatedSlot_Orb.GetComponent<RectTransform>().AnchorMax.Value = new float2(0.79f, 1f);
+
+                                DuplicatedSlot_Orb.GetComponent<Button>().Destroy();
+                                DuplicatedSlot_Orb.GetComponent<Image>().Destroy();
+
+                                DuplicatedSlot_Orb.AttachComponent<Image>();
+
+                                var newBtn_Orb = DuplicatedSlot_Orb.AttachComponent<Button>();
+                                newBtn_Orb.LocalPressed += (IButton b, ButtonEventData _) =>
                                 {
                                     SessionInfo sessionInfo = message.ExtractContent<SessionInfo>();
                                     World world = __instance.LocalUser.World.WorldManager.FocusedWorld;
@@ -84,7 +89,29 @@ namespace MessageCopy
                                         slot.PositionInFrontOfUser();
                                     }));
                                 };
-                                d.GetComponentInChildren<Text>().Content.Value = "Orb";
+                                DuplicatedSlot_Orb.GetComponentInChildren<Text>().Content.Value = "Orb";
+
+                                //Create Copy Button
+                                Slot DuplicatedSlot_Copy = c.Parent.Duplicate();
+                                DuplicatedSlot_Copy.GetComponent<RectTransform>().AnchorMin.Value = new float2(0.4f, 0f);
+                                DuplicatedSlot_Copy.GetComponent<RectTransform>().AnchorMax.Value = new float2(0.59f, 1f);
+
+                                DuplicatedSlot_Copy.GetComponent<Button>().Destroy();
+                                DuplicatedSlot_Copy.GetComponent<Image>().Destroy();
+
+                                DuplicatedSlot_Copy.AttachComponent<Image>();
+
+                                var newBtn_Copy = DuplicatedSlot_Copy.AttachComponent<Button>();
+                                newBtn_Copy.LocalPressed += (IButton b, ButtonEventData _) =>
+                                {
+                                    SessionInfo sessionInfo = message.ExtractContent<SessionInfo>();
+                                    World world = __instance.LocalUser.World.WorldManager.FocusedWorld;
+                                    world.RunSynchronously((Action)(() =>
+                                    {
+                                        b.World.InputInterface.Clipboard.SetText("neos-session:///" + sessionInfo.SessionId);
+                                    }));
+                                };
+                                DuplicatedSlot_Copy.GetComponentInChildren<Text>().Content.Value = "Copy";
                             }
                         }
                     }
