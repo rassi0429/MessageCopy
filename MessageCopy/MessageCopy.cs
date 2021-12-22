@@ -1,8 +1,9 @@
 ﻿using HarmonyLib;
 using NeosModLoader;
-using System;
 using FrooxEngine;
 using BaseX;
+using FrooxEngine.UIX;
+using FrooxEngine.Undo;
 using CloudX.Shared;
 using FrooxEngine.UIX;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace MessageCopy
     {
         public override string Name => "MessageCopy";
         public override string Author => "kka429";
-        public override string Version => "1.0.0";
+        public override string Version => "1.2.0";
         public override string Link => "https://github.com/rassi0429/MessageCopy"; // this line is optional and can be omitted
 
         public override void OnEngineInit()
@@ -144,8 +145,27 @@ namespace MessageCopy
                             }
                         }
                     }
-
-
+                }
+                else if (message.MessageType == CloudX.Shared.MessageType.Sound)
+                {
+                    FrooxEngine.Record record = message.ExtractContent<FrooxEngine.Record>();
+                    Msg(record.AssetURI);
+                    List<Slot> child = ___messagesUi.Current.GetAllChildren();
+                    foreach (Slot c in child)
+                    {
+                        if (c.Name == "Header")
+                        {
+                            Msg(c.ChildrenCount);
+                            if (c.ChildrenCount == 3)
+                            {
+                                Slot d = c.Duplicate();
+                                RectTransform r = d.GetComponent<RectTransform>();
+                                r.AnchorMin.Value = new float2(0.92f, 0f);
+                                r.AnchorMax.Value = new float2(1f, 1f);
+                                r.OffsetMin.Value = new float2(0f, 0f);
+                            }
+                        }
+                    }
                 }
             }
         }
