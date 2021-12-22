@@ -1,11 +1,9 @@
 ﻿using HarmonyLib;
 using NeosModLoader;
 using System;
-using System.Reflection;
 using FrooxEngine;
 using BaseX;
 using CloudX.Shared;
-using CodeX;
 using FrooxEngine.UIX;
 using System.Collections.Generic;
 
@@ -42,7 +40,12 @@ namespace MessageCopy
                             Msg(msg);
                             text.Destroy();
                             var ui = new UIBuilder(c);
-                            ui.Button(msg, new color(1, 1, 1, 0)).LocalPressed += (IButton btn, ButtonEventData _) => { btn.World.InputInterface.Clipboard.SetText(btn.LabelText); };
+                            ui.Button(msg, new color(1, 1, 1, 0)).LocalPressed += (IButton btn, ButtonEventData _) =>
+                            {
+                                if (!__instance.InputInterface.IsClipboardSupported)
+                                    return;
+                                btn.World.InputInterface.Clipboard.SetText(btn.LabelText);
+                            };
                             var btnText = c.GetComponentInChildren<Text>();
                             btnText.Align = message.IsSent ? Alignment.MiddleRight : Alignment.MiddleLeft;
                         }
@@ -72,13 +75,13 @@ namespace MessageCopy
                                 DuplicatedSlot_Orb.GetComponent<Image>().Destroy();
 
                                 DuplicatedSlot_Orb.AttachComponent<Image>();
+                                DuplicatedSlot_Orb.GetComponentInChildren<Text>().Content.Value = "Orb";
 
-                                var newBtn_Orb = DuplicatedSlot_Orb.AttachComponent<Button>();
-                                newBtn_Orb.LocalPressed += (IButton b, ButtonEventData _) =>
+                                DuplicatedSlot_Orb.AttachComponent<Button>().LocalPressed += (IButton b, ButtonEventData _) =>
                                 {
                                     SessionInfo sessionInfo = message.ExtractContent<SessionInfo>();
                                     World world = __instance.LocalUser.World.WorldManager.FocusedWorld;
-                                    world.RunSynchronously((Action)(() =>
+                                    world.RunSynchronously(() =>
                                     {
                                         Slot slot = world.RootSlot.LocalUserSpace.AddSlot("World Orb");
                                         WorldOrb worldOrb = slot.AttachComponent<WorldOrb>();
@@ -86,31 +89,58 @@ namespace MessageCopy
                                         worldOrb.ActiveUsers.Value = sessionInfo.JoinedUsers;
                                         worldOrb.WorldName = sessionInfo.Name;
                                         slot.PositionInFrontOfUser();
-                                    }));
+                                    });
                                 };
-                                DuplicatedSlot_Orb.GetComponentInChildren<Text>().Content.Value = "Orb";
 
-                                //Create Copy Button
-                                Slot DuplicatedSlot_Copy = c.Parent.Duplicate();
-                                DuplicatedSlot_Copy.GetComponent<RectTransform>().AnchorMin.Value = new float2(0.4f, 0f);
-                                DuplicatedSlot_Copy.GetComponent<RectTransform>().AnchorMax.Value = new float2(0.59f, 1f);
+                                //Create Open Button
+                                Slot DuplicatedSlot_Open = c.Parent.Duplicate();
+                                DuplicatedSlot_Open.GetComponent<RectTransform>().AnchorMin.Value = new float2(0.6f, 0f);
+                                DuplicatedSlot_Open.GetComponent<RectTransform>().AnchorMax.Value = new float2(0.79f, 1f);
 
-                                DuplicatedSlot_Copy.GetComponent<Button>().Destroy();
-                                DuplicatedSlot_Copy.GetComponent<Image>().Destroy();
+                                DuplicatedSlot_Open.GetComponent<Button>().Destroy();
+                                DuplicatedSlot_Open.GetComponent<Image>().Destroy();
 
-                                DuplicatedSlot_Copy.AttachComponent<Image>();
+                                DuplicatedSlot_Open.AttachComponent<Image>();
+                                DuplicatedSlot_Open.GetComponentInChildren<Text>().Content.Value = "Open";
 
-                                var newBtn_Copy = DuplicatedSlot_Copy.AttachComponent<Button>();
-                                newBtn_Copy.LocalPressed += (IButton b, ButtonEventData _) =>
+                                DuplicatedSlot_Open.AttachComponent<Button>().LocalPressed += (IButton b, ButtonEventData _) =>
                                 {
                                     SessionInfo sessionInfo = message.ExtractContent<SessionInfo>();
                                     World world = __instance.LocalUser.World.WorldManager.FocusedWorld;
-                                    world.RunSynchronously((Action)(() =>
+                                    world.RunSynchronously(() =>
                                     {
-                                        b.World.InputInterface.Clipboard.SetText("neos-session:///" + sessionInfo.SessionId);
-                                    }));
+                                        if (sessionInfo.HasEnded)
+                                            return;
+                                        Userspace.OpenWorld(new WorldStartSettings()
+                                        {
+                                            URIs = sessionInfo.GetSessionURLs(),
+                                            GetExisting = true,
+                                            AutoFocus = false
+                                        });
+                                    });
                                 };
-                                DuplicatedSlot_Copy.GetComponentInChildren<Text>().Content.Value = "Copy";
+                                ////Create Copy Button
+                                //Slot DuplicatedSlot_Copy = c.Parent.Duplicate();
+                                //DuplicatedSlot_Copy.GetComponent<RectTransform>().AnchorMin.Value = new float2(0.4f, 0f);
+                                //DuplicatedSlot_Copy.GetComponent<RectTransform>().AnchorMax.Value = new float2(0.59f, 1f);
+
+                                //DuplicatedSlot_Copy.GetComponent<Button>().Destroy();
+                                //DuplicatedSlot_Copy.GetComponent<Image>().Destroy();
+
+                                //DuplicatedSlot_Copy.AttachComponent<Image>();
+                                //DuplicatedSlot_Copy.GetComponentInChildren<Text>().Content.Value = "Copy";
+
+                                //DuplicatedSlot_Copy.AttachComponent<Button>().LocalPressed += (IButton b, ButtonEventData _) =>
+                                //{
+                                //    SessionInfo sessionInfo = message.ExtractContent<SessionInfo>();
+                                //    World world = __instance.LocalUser.World.WorldManager.FocusedWorld;
+                                //    world.RunSynchronously(() =>
+                                //    {
+                                //        if (!__instance.InputInterface.IsClipboardSupported)
+                                //            return;
+                                //        b.World.InputInterface.Clipboard.SetText("neos-session:///" + sessionInfo.SessionId);
+                                //    });
+                                //};
                             }
                         }
                     }
