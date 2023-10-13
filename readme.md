@@ -1,5 +1,7 @@
 # MessageCopy
 
+This mod will be closed due to updates coming to "R"
+
 A [NeosModLoader](https://github.com/zkxs/NeosModLoader) mod for [Neos VR](https://neos.com/)  
 The text message will be copied to the clipboard by the trigger
 
